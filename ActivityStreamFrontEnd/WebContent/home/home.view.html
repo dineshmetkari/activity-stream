@@ -1,0 +1,432 @@
+
+
+<div class="ui bottom attached segment pushable homepage" >
+
+
+	<div class="ui visible inverted left vertical sidebar menu" style="overflow-y:auto">
+
+		<a class="item"> Hi {{vm.user.id}}!! </a>
+		
+		
+		<h4 class="ui horizontal inverted divider">My Circles
+		<a class="ui icon" id="addCircleAction" data-content="Create New Circle" data-variation="basic">
+			<i class="add large circle icon"></i>
+		</a>
+		</h4>
+
+	<a class="item" ng-repeat="circle in vm.circles"
+			ng-click="vm.selectCircle(circle)"> <i class="circle thin icon"></i>
+			{{circle}}
+		</a>
+
+		<h4 class="ui horizontal inverted divider">Direct Messages</h4>
+		<!-- <div class="ui inverted fluid category search">
+			<div class="ui icon input">
+				<input class="prompt" type="text" ng-model="searchUser"
+					placeholder="Search users..."> <i class="search icon"></i>
+			</div>
+			<div class="results"></div>
+		</div>
+		<div class="ui secondary vertical pointing menu">
+			<a class="item"
+				ng-repeat="user in vm.allUsers | filter : searchUser |limitTo : 3">
+				{{user.id}} </a>
+
+		</div> -->
+
+<div class="ui secondary vertical pointing menu">
+			<a class="item"
+				ng-repeat="user in vm.recentUsers | filter : searchUser |limitTo : 3" ng-click="vm.selectUser(user)">
+				{{user}} <a class="ui icon" ng-show="{{!!user}}"><i class="remove circle outline icon"></i>
+		</a></a>
+			
+			
+		</div>
+		
+		<h4 class="ui horizontal inverted divider">Subscribed Tags <i class="tags icon"></i></h4>
+		
+		<a class="item" ng-repeat="tag in vm.tags"
+			ng-click="vm.selectTag(tag)"> <i class="tag thin icon"></i>
+			{{tag}}
+		</a>
+	</div>
+	
+
+
+
+	<div class="pusher">
+	<div class="ui secondary menu">
+					<a class="item" id="searchCircleAction"> Circles </a>
+					<a class="item" id="searchUserAction"> Users</a> 
+					<a class="item" id="searchTagAction"> Tags </a>
+					<div class="menu">
+						<div class="item">
+							<div class="ui icon input">
+								<input type="text" placeholder="Search..."> <i
+									class="search link icon"></i>
+							</div>
+						</div>
+						<a class="ui item" ng-click="vm.logout()"> Logout </a>
+					</div>
+				</div>
+		<div class="ui fluid container" id="messageArea" style="height:87vh; overflow-y:auto;">
+			
+			<!-- <div class="ui fluid basic segment"> -->
+				<!-- <div class="ui secondary menu">
+					<a class="item" id="searchCircleAction"> Circles </a>
+					<a class="item" id="searchUserAction"> Users</a> 
+					<a class="item" id="searchTagAction"> Tags </a>
+					<div class="menu">
+						<div class="item">
+							<div class="ui icon input">
+								<input type="text" placeholder="Search..."> <i
+									class="search link icon"></i>
+							</div>
+						</div>
+						<a class="ui item" ng-click="vm.logout()"> Logout </a>
+					</div>
+				</div> -->
+
+
+				<button class="ui fluid bottom attached button" ng-show="vm.resultLength" ng-click="vm.pageChanged(vm.newPageNumber)">Load older messages</button>
+				<div class="ui fluid card"
+					ng-repeat="stream in vm.streams| orderBy : 'postedDate' : false">
+					<div class="content">
+						<div class="header">{{stream.senderID}}</div>
+						 
+							<div class="item" ng-show="stream.circleID"> posted in
+								<div class="ui red horizontal label">{{stream.circleID}}</div>
+							</div>
+						
+						<div class="meta">{{stream.postedDate | date : 'MMMM dd, yyyy hh:mm:ss'}}</div>
+						<div class="description">{{stream.message}}</div>
+						<a class="ui teal tag label"
+							ng-repeat="tag in stream.tag track by $index" ng-click="vm.selectTag(tag);vm.showMessagesWithTag()">{{tag}}</a>
+					</div>
+				</div>
+				 
+
+
+
+				<!-- <div class="ui left action input fluid" id="messageInput">
+
+					<div class="ui ui teal icon top left pointing dropdown button" id="selectMessageType">
+						<i class="add icon"></i>
+						<div class="menu">
+
+							<div class="item" id="imageUploadAction">Image</div>
+							<div class="item" id="fileUploadAction">Attachment</div>
+
+						</div>
+					</div>
+
+
+					<input type="text" value="" ng-model="vm.stream.message"
+						ng-keypress="$event.keyCode === 13 && vm.send()">
+
+
+				</div> -->
+
+
+
+			<!-- </div> -->
+</div>
+ <div class="ui left action input fluid" id="messageInput">
+
+					<div class="ui ui teal icon top left pointing dropdown button" id="selectMessageType">
+						<i class="add icon"></i>
+						<div class="menu">
+
+							<div class="item" id="imageUploadAction">Image</div>
+							<div class="item" id="fileUploadAction">Attachment</div>
+
+						</div>
+					</div>
+
+
+					<input type="text" value="" ng-model="vm.stream.message"
+						ng-keypress="$event.keyCode === 13 && vm.send()">
+
+
+				</div>
+			
+			
+
+		
+	
+	
+</div>
+
+<div class="ui modal" id="createCircleModal">
+	<i class="close icon"></i>
+	<div class="header">Add a Circle</div>
+	<div class="content">
+		<div class="ui input focus">
+			<input type="text" placeholder="Circle Name......"
+				ng-model="vm.circle.id">
+		</div>
+	</div>
+	<div class="actions">
+
+		<div class="ui positive right labeled icon button"
+			ng-click="vm.createCircle()">
+			Create Circle <i class="checkmark icon"></i>
+		</div>
+	</div>
+</div>
+
+
+<div class="ui small modal" id="searchCircleModal">
+	<i class="close icon"></i>
+	<div class="header">Search Available Circles</div>
+	<div class="content">
+
+		<div class="ui floating dropdown labeled icon button">
+			<i class="filter icon"></i> <span class="text">List of Circles</span>
+			<div class="menu">
+				<div class="ui icon search input">
+					<i class="search icon"></i> <input type="text"
+						placeholder="Search circle...">
+				</div>
+				<div class="divider"></div>
+
+				<div class="scrolling menu">
+					
+					
+					<div class="item" ng-repeat="circle in vm.allCircles | orderBy: id" ng-click="vm.showCircleDetails(circle)">
+						
+						{{circle.id}}
+					</div>
+
+				</div>
+			</div>
+		</div>
+		
+		
+	</div>
+	<div class="actions">
+
+		<div class="ui buttons" ng-show="vm.currentCircle">
+  <button class="ui button" ng-disabled="!vm.circleJoinStatus" ng-click="vm.leaveCircle()">Leave Circle</button>
+  <button class="ui positive button" ng-disabled="vm.circleJoinStatus" ng-click="vm.joinCircle()">Join Circle</button>
+</div>
+	</div>
+</div>
+
+
+
+
+
+<div class="ui small modal" id="searchUserModal">
+	<i class="close icon"></i>
+	<div class="header">Search Users</div>
+	<div class="content">
+
+		<div class="ui floating dropdown labeled icon button">
+			<i class="filter icon"></i> <span class="text">List of Users</span>
+			<div class="menu">
+				<div class="ui icon search input">
+					<i class="search icon"></i> <input type="text"
+						placeholder="Search User...">
+				</div>
+				<div class="divider"></div>
+
+				<div class="scrolling menu">
+					
+					
+					<div class="item" ng-repeat="user in vm.allUsers | orderBy: id" ng-click="vm.showUserDetails(user)">
+						
+						{{user.id}}
+					</div>
+
+				</div>
+			</div>
+		</div>
+		
+		
+	</div>
+	<div class="actions">
+
+<div class="ui buttons" ng-show="vm.selectedUser">
+  <button class="ui positive button" ng-click="vm.startPrivateMessage()">Message</button>
+</div>
+	</div>
+</div>
+
+
+<div class="ui small modal" id="searchTagModal">
+	<i class="close icon"></i>
+	<div class="header">Search Tags</div>
+	<div class="content">
+
+		<div class="ui floating dropdown labeled icon button">
+			<i class="filter icon"></i> <span class="text">List of Tags</span>
+			<div class="menu">
+				<div class="ui icon search input">
+					<i class="search icon"></i> <input type="text"
+						placeholder="Search Tag...">
+				</div>
+				<div class="divider"></div>
+
+				<div class="scrolling menu">
+					
+					
+					<div class="item" ng-repeat="tag in vm.allTags" ng-click="vm.showTagDetails(tag)">
+						
+						{{tag}}
+					</div>
+
+				</div>
+			</div>
+		</div>
+		
+		
+	</div>
+	<div class="actions">
+
+ <div class="ui buttons" ng-show="vm.selectedTag">
+ 	<button class="ui positive button" ng-hide="vm.tagSubscriptionStatus" ng-click="vm.subscribeStreamWithTag()">Subscribe</button>
+ 	<button class="ui negative button" ng-show="vm.tagSubscriptionStatus" ng-click="vm.unsubscribeStreamWithTag()">Unsubscribe</button>
+ 	<div class="or"></div>
+  <button class="ui teal button" ng-click="vm.showMessagesWithTag(1)">Search Stream</button>
+</div>
+	</div>
+</div>
+
+
+ 
+</div>
+
+<div class="ui large modal" id="imageUploadModal">
+    <div class="header">
+      Select a Photo
+    </div>
+   
+    <div class="image content">
+      <div class="ui medium image">
+        <img src="images/rachel.png">
+      </div>
+		<div class="description">
+			<div class="ui header">Upload Photo</div>
+			<form action="http://localhost:8080/ActivityRestService/fileupload_image" method="post"  enctype="multipart/form-data">
+			<div class="ui input">
+				<input type="file" placeholder="Upload photo..." name="file">
+
+			</div>
+			<input class="ui button" type="submit" value="Load Image"></input>
+			</form>
+			<p>Is it okay to use this photo?</p>
+		</div>
+	</div>
+    
+    <div class="actions">
+      <div class="ui black deny button">
+        Cancel
+      </div>
+      <div class="ui positive right labeled icon button">
+        Post
+        <i class="checkmark icon"></i>
+      </div>
+    </div>
+    </div>
+    
+    
+    <div class="ui large modal" id="fileUploadModal">
+    <div class="header">
+      Upload File
+    </div>
+   
+    <div class="content">
+      
+		<div class="description">
+			<div class="ui header">Upload File</div>
+			<form action="http://localhost:8080/ActivityRestService/fileupload" method="post"  enctype="multipart/form-data">
+			<div class="ui input">
+				<input type="file" placeholder="Upload file..." name="file">
+
+			</div>
+			<input class="ui button" type="submit" value="Upload File"></input>
+			</form>
+			<p>Is it okay to use this file?</p>
+		</div>
+	</div>
+    
+    <div class="actions">
+      <div class="ui black deny button">
+        Cancel
+      </div>
+      <div class="ui positive right labeled icon button">
+        Post
+        <i class="checkmark icon"></i>
+      </div>
+    </div>
+    </div>
+
+<script>
+$(document).ready(function(){
+    $("#addCircleAction").click(function(){
+    	$('#createCircleModal')
+    	  .modal('show')
+    	;
+    });
+    
+    $("#searchCircleAction").click(function(){
+    	$('#searchCircleModal')
+    	  .modal('show')
+    	;
+    });
+    
+    $("#searchUserAction").click(function(){
+    	$('#searchUserModal')
+    	  .modal('show')
+    	;
+    });
+    
+    $("#searchTagAction").click(function(){
+    	$('#searchTagModal')
+    	  .modal('show')
+    	;
+    });
+    
+    $("#imageUploadAction").click(function(){
+    	$('#imageUploadModal')
+    	.modal({
+    		blurring: true
+  		})
+    	  .modal('show')
+    	;
+    });
+    
+    
+    $("#fileUploadAction").click(function(){
+    	$('#fileUploadModal')
+    	.modal({
+    		blurring: true
+  		})
+    	  .modal('show')
+    	;
+    });
+    
+    $('#addCircleAction')
+    .popup({
+      
+    });
+    
+    
+    $('.ui.dropdown')
+    .dropdown()
+  ;
+    
+    $('#selectMessageType')
+    .dropdown({
+    	direction : 'upward'
+    })
+  ;
+    
+    
+    
+    
+});
+</script>
+
+
